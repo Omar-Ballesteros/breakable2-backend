@@ -1,16 +1,22 @@
 package com.spotifyapp.backend.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.spotifyapp.backend.service.SpotifyAuthService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api")
 
 public class AuthController {
 
-    @GetMapping("/login")
-    public String login() {
-        return "Redirigiendo a Spotify...";
+    private final SpotifyAuthService spotifyAuthService;
+
+    public AuthController(SpotifyAuthService spotifyAuthService) {
+        this.spotifyAuthService = spotifyAuthService;
+    }
+
+    @PostMapping("/auth/spotify")
+    public ResponseEntity<?> authenticateWithSpotify(@RequestParam("code") String code) {
+        return ResponseEntity.ok(spotifyAuthService.exchangeCodeForTokens(code));
     }
 }
