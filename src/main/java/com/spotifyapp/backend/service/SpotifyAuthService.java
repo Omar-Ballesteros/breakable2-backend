@@ -51,5 +51,31 @@ public class SpotifyAuthService {
                 new ParameterizedTypeReference<Map<String, Object>>() {}
         );
         return response.getBody();
-}
+    }
+
+    public Map<String, Object> refreshAccessToken(String refreshToken) {
+        String authUrl = "https://accounts.spotify.com/api/token";
+        // Headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        String basicAuth = Base64.getEncoder()
+            .encodeToString((clientId + ":" + clientSecret).getBytes());
+        headers.set("Authorization", "Basic " + basicAuth);
+
+        // Body
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "refresh_token");
+        body.add("refresh_token", refreshToken);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
+
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                authUrl,
+                HttpMethod.POST,
+                request,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+        return response.getBody();
+    }
 }

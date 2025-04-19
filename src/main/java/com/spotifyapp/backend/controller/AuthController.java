@@ -19,4 +19,9 @@ public class AuthController {
     public ResponseEntity<?> authenticateWithSpotify(@RequestParam("code") String code) {
         return ResponseEntity.ok(spotifyAuthService.exchangeCodeForTokens(code));
     }
+
+    @PostMapping("/auth/spotify/refresh")
+    public ResponseEntity<?> refreshSpotifyToken(@RequestParam("refresh_token") String refreshToken) {
+        return ResponseEntity.ok(spotifyAuthService.refreshAccessToken(refreshToken));
+    }
 }
