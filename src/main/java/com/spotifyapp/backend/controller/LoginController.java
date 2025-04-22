@@ -24,7 +24,7 @@ public class LoginController {
         String scope = "user-top-read";
         String authorizeURL = "https://accounts.spotify.com/authorize?" +
                 "response_type=code" +
-                "&client_id" + clientId +
+                "&client_id=" + clientId +
                 "&scope=" + URLEncoder.encode(scope, StandardCharsets.UTF_8) +
                 "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
 
