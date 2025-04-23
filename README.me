@@ -1,0 +1,42 @@
+# Breakable Toy II - Spotify Integration Backend
+
+Backend de app fullstack that integrates the Spotify API using Java, Spring Boot, and Gradle.
+Exposes RESTful endpoints to retrieve data of artists, albums, playlists, and tracks.
+
+## Technologies
+
+- Java
+- Spring Boot
+- Gradle
+- Spotify Web API
+- RestTemplate
+
+## Main Features
+
+- Redirects users to Spotify login using OAuth 2.0
+- Handles access and refresh tokens
+- Provides endpoints to:
+
+## How to run
+
+1. Clone this repository
+2. Set the required environment variables in `application.properties`:
+
+```properties
+spotify.client-id=your-client-id
+spotify.client-secret=your-client-secret
+# Replace it with your frontend redirect URI
+spotify.redirect-uri=http://127.0.0.1:3000
+```
+
+3. Run the application:
+
+```bash
+./gradlew bootRun
+```
+
+### API Endpoints
+
+| Method | Endpoint             | Description                                  |
+|--------|----------------------|----------------------------------------------|
+| POST   | /auth/spotify        | Handles Spotify OAuth flow and returns tokens |
