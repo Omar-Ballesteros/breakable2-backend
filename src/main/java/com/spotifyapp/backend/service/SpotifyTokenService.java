@@ -3,7 +3,6 @@ package com.spotifyapp.backend.service;
 import com.spotifyapp.backend.model.SpotifyToken;
 import com.spotifyapp.backend.repository.SpotifyTokenRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
