@@ -14,16 +14,22 @@ import java.util.Map;
 @Service
 public class SpotifyAuthService {
 
-    @Value("${spotify.client-id}")
-    private String clientId;
+    private final String clientId;
+    private final String clientSecret;
+    private final String redirectUri;
+    private final RestTemplate restTemplate;
 
-    @Value("${spotify.client-secret}")
-    private String clientSecret;
-
-    @Value("${spotify.redirect-uri}")
-    private String redirectUri;
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    public SpotifyAuthService(
+            @Value("${spotify.client-id}") String clientId,
+            @Value("${spotify.client-secret}") String clientSecret,
+            @Value("${spotify.redirect-uri}") String redirectUri,
+            RestTemplate restTemplate
+    ) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.redirectUri = redirectUri;
+        this.restTemplate = restTemplate;
+    }
 
     public Map<String, Object> exchangeCodeForTokens(String code) {
         String authUrl = "https://accounts.spotify.com/api/token";
@@ -48,7 +54,8 @@ public class SpotifyAuthService {
                 authUrl,
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<Map<String, Object>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
         return response.getBody();
     }
@@ -74,7 +81,8 @@ public class SpotifyAuthService {
                 authUrl,
                 HttpMethod.POST,
                 request,
-                new ParameterizedTypeReference<Map<String, Object>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
         return response.getBody();
     }
