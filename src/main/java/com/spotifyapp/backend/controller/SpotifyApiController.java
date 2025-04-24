@@ -24,6 +24,11 @@ public class SpotifyApiController {
     public String getAlbum(@PathVariable String id, @RequestParam String userId) {
         return spotifyApiService.getAlbum(id, userId);
     }
+
+    @GetMapping("/search")
+    public String search(@RequestParam String query, @RequestParam String type, @RequestParam String userId) {
+        return spotifyApiService.search(query, type, userId);
+    }
 }
 
 

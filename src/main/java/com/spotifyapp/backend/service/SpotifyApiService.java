@@ -8,6 +8,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +32,13 @@ public class SpotifyApiService {
     public String getAlbum(String albumId, String userId) {
         SpotifyToken token = tokenService.getValidAccessToken(userId);
         return makeGetRequest("https://api.spotify.com/v1/albums/" + albumId, token);
+    }
+
+    public String search(String query, String type, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        String encodedQuery = UriUtils.encodeQuery(query, StandardCharsets.UTF_8);
+        String url = "https://api.spotify.com/v1/search?q=" + encodedQuery + "&type=" + type;
+        return makeGetRequest(url, token);
     }
 
     private String makeGetRequest(String url, SpotifyToken token) {
