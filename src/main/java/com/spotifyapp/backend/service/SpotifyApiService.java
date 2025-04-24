@@ -23,7 +23,12 @@ public class SpotifyApiService {
 
     public String getArtist(String artistId, String userId) {
         SpotifyToken token = tokenService.getValidAccessToken(userId);
-        return makeGetRequest("https://api.spotify.com/v1/artists/", token);
+        return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId, token);
+    }
+
+    public String getAlbum(String albumId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/albums/" + albumId, token);
     }
 
     private String makeGetRequest(String url, SpotifyToken token) {
