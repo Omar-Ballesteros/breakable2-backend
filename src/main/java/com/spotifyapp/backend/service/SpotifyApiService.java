@@ -21,6 +21,11 @@ public class SpotifyApiService {
         return makeGetRequest("https://api.spotify.com/v1/me/top/artists", token);
     }
 
+    public String getArtist(String artistId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/artists/", token);
+    }
+
     private String makeGetRequest(String url, SpotifyToken token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token.getAccessToken());
