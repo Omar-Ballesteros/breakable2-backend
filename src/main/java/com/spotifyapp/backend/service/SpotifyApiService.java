@@ -8,6 +8,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -16,15 +19,35 @@ public class SpotifyApiService {
     private final SpotifyTokenService tokenService;
     private final RestTemplate restTemplate;
 
-    public String getUserTopTracks(String userId) {
+    public String getUserTopArtists(String userId) {
         SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/me/top/artists", token);
+    }
 
+    public String getArtist(String artistId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId, token);
+    }
+
+    public String getAlbum(String albumId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/albums/" + albumId, token);
+    }
+
+    public String search(String query, String type, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        String encodedQuery = UriUtils.encodeQuery(query, StandardCharsets.UTF_8);
+        String url = "https://api.spotify.com/v1/search?q=" + encodedQuery + "&type=" + type;
+        return makeGetRequest(url, token);
+    }
+
+    private String makeGetRequest(String url, SpotifyToken token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token.getAccessToken());
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(
-                "https://api.spotify.com/v1/me/top/tracks",
+                url,
                 HttpMethod.GET,
                 entity,
                 String.class
