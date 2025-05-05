@@ -6,6 +6,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Base64;
@@ -50,14 +52,21 @@ public class SpotifyAuthService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                authUrl,
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<>() {
-                }
-        );
-        return response.getBody();
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    authUrl,
+                    HttpMethod.POST,
+                    request,
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
+            return response.getBody();
+        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+            System.err.println("Error al cambiar el codigo por tokens:");
+            System.err.println("Status: " + ex.getStatusCode());
+            System.err.println("Response: " + ex.getResponseBodyAsString());
+            throw ex;
+        }
     }
 
     public Map<String, Object> refreshAccessToken(String refreshToken) {
