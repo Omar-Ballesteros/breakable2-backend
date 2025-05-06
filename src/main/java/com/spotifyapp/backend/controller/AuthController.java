@@ -1,19 +1,16 @@
 package com.spotifyapp.backend.controller;
 
+import com.spotifyapp.backend.model.SpotifyToken;
 import com.spotifyapp.backend.service.SpotifyAuthService;
 import com.spotifyapp.backend.service.SpotifyTokenService;
 import org.slf4j.Logger;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
@@ -41,7 +38,7 @@ public class AuthController {
             Integer expiresIn = (Integer) tokens.get("expires_in");
 
             if (accessToken == null || refreshToken == null || expiresIn == null) {
-                return ResponseEntity.status(502).body(Map.of("error", "Invalid response from Spotify"));
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid tokens"));
             }
 
             HttpHeaders headers = new HttpHeaders();
@@ -59,22 +56,24 @@ public class AuthController {
 
             Map<String, Object> responseBody = response.getBody();
             if (responseBody == null || !responseBody.containsKey("id")) {
-                return ResponseEntity.status(502).body(Map.of("error", "Failed to retrieve user information from Spotify"));
+                return ResponseEntity.badRequest().body(Map.of("error", "Could not fetch user info"));
             }
 
-            String userId = (String) Objects.requireNonNull(response.getBody()).get("id");
+            String userId = (String) responseBody.get("id");
 
             spotifyTokenService.saveTokens(userId, accessToken, refreshToken, expiresIn);
 
-            return ResponseEntity.ok(Map.of("message", "Authenticated successfully", "userId", userId));
+            return ResponseEntity.ok(Map.of("userId", userId, "accessToken", accessToken, "expiresIn", expiresIn));
         } catch (Exception e) {
             logger.error("An unexpected error occurred", e);
-            return ResponseEntity.status(500).body(Map.of("error", "An unexpected error occurred", "details", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Unexpected error", "message", e.getMessage()));
         }
     }
 
-    @PostMapping("/auth/spotify/refresh")
-    public ResponseEntity<?> refreshSpotifyToken(@RequestParam("refresh_token") String refreshToken) {
-        return ResponseEntity.ok(spotifyAuthService.refreshAccessToken(refreshToken));
+    @GetMapping("/access-token")
+    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam String userId) {
+        SpotifyToken token = spotifyTokenService.getValidAccessToken(userId);
+        return ResponseEntity.ok(Map.of("access_token", token.getAccessToken()));
     }
 }
