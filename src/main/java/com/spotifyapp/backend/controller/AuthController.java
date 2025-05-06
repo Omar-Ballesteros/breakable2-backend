@@ -1,5 +1,6 @@
 package com.spotifyapp.backend.controller;
 
+import com.spotifyapp.backend.model.SpotifyToken;
 import com.spotifyapp.backend.service.SpotifyAuthService;
 import com.spotifyapp.backend.service.SpotifyTokenService;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class AuthController {
 
             spotifyTokenService.saveTokens(userId, accessToken, refreshToken, expiresIn);
 
-            return ResponseEntity.ok(Map.of("userId", userId));
+            return ResponseEntity.ok(Map.of("userId", userId, "accessToken", accessToken, "expiresIn", expiresIn));
         } catch (Exception e) {
             logger.error("An unexpected error occurred", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -70,8 +71,9 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/auth/spotify/refresh")
-    public ResponseEntity<?> refreshSpotifyToken(@RequestParam("refresh_token") String refreshToken) {
-        return ResponseEntity.ok(spotifyAuthService.refreshAccessToken(refreshToken));
+    @GetMapping("/access-token")
+    public ResponseEntity<Map<String, String>> getAccessToken(@RequestParam String userId) {
+        SpotifyToken token = spotifyTokenService.getValidAccessToken(userId);
+        return ResponseEntity.ok(Map.of("access_token", token.getAccessToken()));
     }
 }

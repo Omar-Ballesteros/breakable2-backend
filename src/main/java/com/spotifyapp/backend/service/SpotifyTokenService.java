@@ -17,7 +17,7 @@ public class SpotifyTokenService {
 
 
     public SpotifyToken getValidAccessToken(String userId) {
-        SpotifyToken token = repository.findById(userId).orElseThrow();
+        SpotifyToken token = repository.findById(userId).orElseThrow(() -> new RuntimeException("User not found or token not stored"));
 
         if (token.getExpiresAt().isBefore(Instant.now().plusSeconds(60))) {
             token = refreshAccessToken(token);
