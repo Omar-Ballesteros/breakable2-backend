@@ -29,6 +29,16 @@ public class SpotifyApiService {
         return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId, token);
     }
 
+    public String getArtistTopTracks(String artistId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId + "/top-tracks", token);
+    }
+
+    public String getArtistAlbums(String artistId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId + "/albums", token);
+    }
+
     public String getAlbum(String albumId, String userId) {
         SpotifyToken token = tokenService.getValidAccessToken(userId);
         return makeGetRequest("https://api.spotify.com/v1/albums/" + albumId, token);
