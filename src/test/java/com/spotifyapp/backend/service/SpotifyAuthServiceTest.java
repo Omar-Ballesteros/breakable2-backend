@@ -63,4 +63,35 @@ class SpotifyAuthServiceTest {
                 any(ParameterizedTypeReference.class)
         );
     }
+    @Test
+    void testRefreshAccessToken() {
+        // Arrange
+        String refreshToken = "mockRefreshToken123";
+        Map<String, Object> mockResponse = new HashMap<>();
+        mockResponse.put("access_token", "newAccessToken");
+
+        ResponseEntity<Map<String, Object>> responseEntity =
+                new ResponseEntity<>(mockResponse, HttpStatus.OK);
+
+        when(restTemplate.exchange(
+                eq("https://accounts.spotify.com/api/token"),
+                eq(HttpMethod.POST),
+                any(HttpEntity.class),
+                any(ParameterizedTypeReference.class)
+        )).thenReturn(responseEntity);
+
+        // Act
+        Map<String, Object> result = authService.refreshAccessToken(refreshToken);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("newAccessToken", result.get("access_token"));
+
+        verify(restTemplate, times(1)).exchange(
+                eq("https://accounts.spotify.com/api/token"),
+                eq(HttpMethod.POST),
+                any(HttpEntity.class),
+                any(ParameterizedTypeReference.class)
+        );
+    }
 }
