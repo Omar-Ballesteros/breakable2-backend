@@ -115,5 +115,7 @@ You can modify this in the `SecurityConfig.java` file if needed.
 | GET    | /api/access-token     | Returns a valid access token for a given user ID       | userId (user identifier)                  |
 | GET    | /api/me/top/artists   | Get the top artists of the authenticated user          | userId (user identifier)                  |
 | GET    | /api/artists/{id}     | Get detailed information of an artist                  | userId (user identifier)                  |
+| GET    | /api/artists/{id}/top-tracks  | Get the top tracks of an artist                | userId (user identifier)                  |
+| GET    | /api/artists/{id}/albums      | Get the albums of an artist                    | userId (user identifier)                  |
 | GET    | /api/albums/{id}      | Get details of an album                                | userId (user identifier)                  |
 | GET    | /api/search           | Search for artists, albums, or songs                   | query, type, userId (query parameters)    |
