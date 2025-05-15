@@ -1,6 +1,6 @@
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:21-jdk AS builder
 WORKDIR /app
-COPY build.gradle settings.gradle ./
+COPY . .
 
 RUN ./gradlew build --no-daemon
 
