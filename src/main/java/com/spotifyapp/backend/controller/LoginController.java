@@ -21,7 +21,7 @@ public class LoginController {
 
     @GetMapping("/api/login")
     public void login(HttpServletResponse response) throws IOException {
-        String scope = "user-top-read user-read-private";
+        String scope = "user-top-read user-read-private user-modify-playback-state";
         String authorizeURL = "https://accounts.spotify.com/authorize?" +
                 "response_type=code" +
                 "&client_id=" + clientId +

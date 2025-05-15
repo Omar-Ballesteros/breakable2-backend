@@ -7,10 +7,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,16 @@ public class SpotifyApiService {
     public String getArtist(String artistId, String userId) {
         SpotifyToken token = tokenService.getValidAccessToken(userId);
         return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId, token);
+    }
+
+    public String getArtistTopTracks(String artistId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId + "/top-tracks", token);
+    }
+
+    public String getArtistAlbums(String artistId, String userId) {
+        SpotifyToken token = tokenService.getValidAccessToken(userId);
+        return makeGetRequest("https://api.spotify.com/v1/artists/" + artistId + "/albums", token);
     }
 
     public String getAlbum(String albumId, String userId) {
@@ -46,12 +58,34 @@ public class SpotifyApiService {
         headers.set("Authorization", "Bearer " + token.getAccessToken());
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-        return response.getBody();
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+            return response.getBody();
+        } catch (HttpClientErrorException.TooManyRequests e) {
+            String retryAfterHeader = Objects.requireNonNull(e.getResponseHeaders()).getFirst("Retry-After");
+            if (retryAfterHeader != null) {
+                int retryAfterSeconds = Integer.parseInt(retryAfterHeader);
+                try {
+                    Thread.sleep(retryAfterSeconds * 1000L);
+                    ResponseEntity<String> retryResponse = restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            entity,
+                            String.class
+                    );
+                    return retryResponse.getBody();
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Thread interrupted while handling rate limit", ie);
+                }
+            } else {
+                throw e;
+            }
+        }
     }
 }
